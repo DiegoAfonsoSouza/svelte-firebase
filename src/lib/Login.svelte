@@ -1,16 +1,26 @@
 <script>
-  import { authSignIn } from "$lib/login";
+    import { goto } from "$app/navigation";
+    import { authSignIn } from "$lib/auth";
 
     let emailInput = '';
     let passwordInput = '';
-    function obterValorInput() {
-        authSignIn(emailInput, passwordInput);
+    
+    async function realizarLogin() {
+        const autenticado = await authSignIn(emailInput, passwordInput);
+        console.log(autenticado);
+        if (autenticado) {
+            console.log("Usuário autenticado");
+            goto('/home');
+        } else {
+            console.log("Usuário não autenticado");
+        }
     }
+
 </script>
 
 <section class="bg-white dark:bg-gray-900">
     <div class="container flex items-center justify-center min-h-screen px-6 mx-auto">
-        <form class="w-full max-w-md" on:submit|preventDefault={obterValorInput}>
+        <form class="w-full max-w-md" on:submit|preventDefault={realizarLogin}>
 
             <h1 class="text-center mt-3 text-2xl font-semibold text-gray-800 capitalize sm:text-3xl dark:text-white">Login</h1>
 
@@ -21,7 +31,7 @@
                     </svg>
                 </span>
 
-                <input bind:value={emailInput} type="email" class="block w-full py-3 text-gray-700 bg-white border rounded-lg px-11 dark:bg-gray-900 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 dark:focus:border-blue-300 focus:ring-blue-300 focus:outline-none focus:ring focus:ring-opacity-40" placeholder="Email">
+                <input bind:value={emailInput} type="email" class="block w-full py-3 text-gray-700 bg-white border rounded-lg px-11 dark:bg-gray-900 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 dark:focus:border-blue-300 focus:ring-blue-300 focus:outline-none focus:ring focus:ring-opacity-40" placeholder="Email" required>
             </div>
 
             <div class="relative flex items-center mt-4">
@@ -31,7 +41,7 @@
                     </svg>
                 </span>
 
-                <input bind:value={passwordInput} type="password" class="block w-full px-10 py-3 text-gray-700 bg-white border rounded-lg dark:bg-gray-900 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 dark:focus:border-blue-300 focus:ring-blue-300 focus:outline-none focus:ring focus:ring-opacity-40" placeholder="Senha">
+                <input bind:value={passwordInput} type="password" class="block w-full px-10 py-3 text-gray-700 bg-white border rounded-lg dark:bg-gray-900 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 dark:focus:border-blue-300 focus:ring-blue-300 focus:outline-none focus:ring focus:ring-opacity-40" placeholder="Senha" required>
             </div>
 
             <div class="mt-6">
