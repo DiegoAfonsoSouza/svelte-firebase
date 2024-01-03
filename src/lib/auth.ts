@@ -1,34 +1,50 @@
-import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "firebase/auth";
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+  signOut,
+  GoogleAuthProvider,
+  signInWithPopup
+} from "firebase/auth";
 import app from "$lib/initializeFirebase";
+import { isAuthenticated } from "./stores";
+export const auth = getAuth(app);
 
-const auth = getAuth();
+// export function validateSession(id: string) {
+//   const sesstion = get(sessionsStore);
+//   const sesstionResult = sessions.find
+// }
 
 /* Estado do Usuário */
-onAuthStateChanged(auth, (user) => {
-  if (user) {
-    // User is signed in, see docs for a list of available properties
-    // https://firebase.google.com/docs/reference/js/auth.user
-    const uid = user.uid;
-    console.log("usuário logado: " + uid);
-    console.log("email: " + user.email);
-  } else {
-    // User is signed out
-    console.log("Usuário deslogado.");
-    
+auth.onAuthStateChanged(authUser => {
+  isAuthenticated.set(!!authUser);
+  console.log("auth: " + !!authUser);
+  if (authUser) {
+      console.log();
+      // goto("/home");
+  } else if (!authUser) {
+    console.log();
+    // goto("/");
   }
 });
+// onAuthStateChanged(auth, (user) => {
+//     if (user) {
+//       isAuthenticated.set(!!user); /* !! garante a conversão para um valor booleano */
+//       console.log("usuário logado: " + user.uid);
+//       console.log("current user: " + auth.currentUser?.email);
+//     } else {
+//       // User is signed out
+//       console.log("Usuário deslogado.");
+//       console.log("current user: " + auth.currentUser);
+//       isAuthenticated.set(false);
+//     }
+//   });
 
 /* Autenticar usuário */
 export async function authSignIn(emailInput: string, passwordInput: string) {
   try {
-    const userCredential = await signInWithEmailAndPassword(
-      auth,
-      emailInput,
-      passwordInput
-    );
-    const user = userCredential.user;
-    alert("Bem Vindo " + user.email);
-    return true;
+    const userCredential = await signInWithEmailAndPassword(auth, emailInput, passwordInput);
+    // localStorage.setItem('firebaseToken', await userCredential.user.getIdToken());
+    alert("Bem Vindo " + userCredential.user.email);
   } catch (error: any) {
     if (error.code === "auth/invalid-credential") {
       alert("Usuário/Senha Invalidos.");
@@ -37,11 +53,19 @@ export async function authSignIn(emailInput: string, passwordInput: string) {
     } else {
       alert("Erro desconhecido: " + error.code);
     }
-
-    return false;
   }
 }
-
+/* Autenticar usuário com google */
+export async function authSignInGoogle() {
+  try {
+    const provider = new GoogleAuthProvider();
+    const userCredentialGoogle = await signInWithPopup(auth, provider);
+    console.log("Login com google: " + userCredentialGoogle);
+    window.location.href = '/home';
+  } catch (error: any) {
+    alert("Erro: " + error.code);
+  }
+}
 /* Deslogar usuário */
 // Outra abordagem com .then .catch
 /* export function authSignOut() {
